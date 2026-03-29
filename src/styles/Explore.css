@@ -1,0 +1,179 @@
+/* ═══════════════════════════════════════════
+   Explore Page — Premium Design
+   ═══════════════════════════════════════════ */
+
+.explore-page {
+    padding: 32px 40px 40px;
+    max-width: 1200px;
+    min-height: 100vh;
+}
+
+/* ─── Header ─── */
+.explore-header {
+    margin-bottom: 32px;
+}
+
+.explore-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    color: var(--color-dark-green);
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.92;
+    margin-bottom: 20px;
+}
+
+.explore-title .accent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-accent);
+    text-transform: lowercase;
+    font-weight: 400;
+}
+
+[data-theme='dark'] .explore-title {
+    color: white;
+}
+
+/* ─── Search ─── */
+.explore-search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 999px;
+    background: var(--color-beige-dark);
+    border: 1px solid rgba(0, 77, 44, 0.06);
+    max-width: 520px;
+    transition: all 0.3s ease;
+}
+
+.explore-search:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(230, 0, 126, 0.08);
+}
+
+.explore-search svg {
+    color: rgba(0, 77, 44, 0.35);
+    flex-shrink: 0;
+}
+
+.explore-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--color-dark-green);
+}
+
+.explore-search input::placeholder {
+    color: rgba(0, 77, 44, 0.3);
+}
+
+/* ─── Content ─── */
+/* Tighter rhythm between category pills and grid (esp. mobile) */
+.explore-page .category-filters {
+    margin-top: 0.15rem;
+    margin-bottom: 0.65rem;
+}
+
+.explore-content {
+    min-height: 400px;
+    margin-top: 0;
+}
+
+.search-results-title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 77, 44, 0.5);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+[data-theme='dark'] .search-results-title {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ─── Pinterest Grid ─── */
+.pinterest-grid {
+    columns: 4;
+    column-gap: 20px;
+}
+
+.pinterest-grid>* {
+    break-inside: avoid;
+    margin-bottom: 20px;
+}
+
+/* ─── Dark Theme ─── */
+[data-theme='dark'] .explore-search {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .explore-search:focus-within {
+    border-color: var(--color-accent);
+}
+
+[data-theme='dark'] .explore-search svg {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme='dark'] .explore-search input {
+    color: white;
+}
+
+[data-theme='dark'] .explore-search input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+    .pinterest-grid {
+        columns: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .explore-page {
+        padding: 20px 16px 40px;
+    }
+
+    .explore-header {
+        margin-bottom: 1.1rem;
+    }
+
+    .explore-title {
+        font-size: 32px;
+        margin-bottom: 14px;
+    }
+
+    .explore-page .category-filters {
+        margin-top: 0;
+        margin-bottom: 0.35rem;
+    }
+
+    .explore-content {
+        padding-top: 0.2rem;
+    }
+
+    .pinterest-grid {
+        columns: 2;
+        column-gap: 12px;
+    }
+
+    .pinterest-grid>* {
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pinterest-grid {
+        columns: 1;
+    }
+}

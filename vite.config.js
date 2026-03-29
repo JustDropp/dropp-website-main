@@ -1,0 +1,23 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  base: '/',
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^/, ''),
+      },
+      '/user': {
+        target: 'https://dropp-0oxl.onrender.com',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+})
