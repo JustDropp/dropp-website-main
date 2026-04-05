@@ -193,20 +193,16 @@ const ProductDetailPage = () => {
         }
     };
 
+    const isFeatured = product?.featuredUntil && new Date(product.featuredUntil) > new Date();
+
     const handleFeatureProduct = async () => {
-        if (!isOwner || featureLoading) return;
-        const nextFeatured = !product?.isFeatured;
+        if (!isOwner || featureLoading || isFeatured) return;
         setFeatureLoading(true);
-        setProduct((prev) => ({ ...prev, isFeatured: nextFeatured }));
         try {
-            await ProductService.featureProduct(id);
-            setSnackbar({
-                show: true,
-                message: nextFeatured ? 'Product marked as featured' : 'Product unfeatured',
-                type: 'success'
-            });
+            await ProductService.featureProduct(id, 24);
+            setProduct((prev) => ({ ...prev, featuredUntil: new Date(Date.now() + 24*60*60*1000).toISOString() }));
+            setSnackbar({ show: true, message: 'Product marked as featured', type: 'success' });
         } catch (error) {
-            setProduct((prev) => ({ ...prev, isFeatured: !nextFeatured }));
             setSnackbar({ show: true, message: 'Failed to update featured status', type: 'error' });
         } finally {
             setFeatureLoading(false);
@@ -484,12 +480,12 @@ const ProductDetailPage = () => {
 
                                         {isOwner && (
                                             <button
-                                                className={`pdp-action-btn${product?.isFeatured ? ' pdp-liked' : ''}`}
+                                                className={`pdp-action-btn${isFeatured ? ' pdp-liked' : ''}`}
                                                 onClick={handleFeatureProduct}
-                                                disabled={featureLoading}
+                                                disabled={featureLoading || isFeatured}
                                             >
                                                 <Sparkles size={16} />
-                                                {product?.isFeatured ? 'Featured' : 'Feature'}
+                                                {isFeatured ? 'Featured' : 'Feature'}
                                             </button>
                                         )}
                                     </div>

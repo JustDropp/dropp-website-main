@@ -219,7 +219,7 @@ const CollectionDetailPage = () => {
     };
 
     const handleAddProducts = () => {
-        if (!isOwner) return;
+        if (!canAddProducts) return;
         setIsAddProductModalOpen(true);
     };
 

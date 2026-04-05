@@ -29,7 +29,7 @@ export class UserProfile {
 
     static fromJSON(json) {
         // Handle potential ID match with _id just in case
-        const data = json.data || json;
+        const data = json.user || json.data || json;
         return new UserProfile(data);
     }
 }

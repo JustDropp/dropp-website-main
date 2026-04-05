@@ -54,7 +54,8 @@ class CollectionRepository {
         const response = await apiClient.post(API_CONFIG.ENDPOINTS.COLLECTIONS, {
             title: data.title,
             desc: data.desc,
-            isCollectionPrivate: Boolean(data.isPrivate)
+            isCollectionPrivate: Boolean(data.isPrivate),
+            category: data.category || []
         });
         return response.data;
     }
@@ -79,7 +80,8 @@ class CollectionRepository {
         // Use PATCH /c/{id} as requested
         const response = await apiClient.patch(`${API_CONFIG.ENDPOINTS.COLLECTIONS}/${id}`, {
             title: data.title,
-            desc: data.desc
+            desc: data.desc,
+            category: data.category || []
         });
         return response.data;
     }

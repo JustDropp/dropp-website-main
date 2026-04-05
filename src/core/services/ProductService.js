@@ -11,7 +11,7 @@ class ProductService {
     async getExploreProducts() {
         try {
             const response = await ProductRepository.getExploreProducts();
-            return response.result || [];
+            return response.results || [];
         } catch (error) {
             console.error('ProductService.getExploreProducts error:', error);
             throw error;
@@ -21,7 +21,7 @@ class ProductService {
     async getProductById(id) {
         try {
             const response = await ProductRepository.getProductById(id);
-            return response.result || response;
+            return response.results || response;
         } catch (error) {
             console.error('ProductService.getProductById error:', error);
             throw error;
@@ -148,8 +148,8 @@ class ProductService {
         return ProductRepository.pinProduct(id);
     }
 
-    async featureProduct(id) {
-        return ProductRepository.featureProduct(id);
+    async featureProduct(id, duration = 24) {
+        return ProductRepository.featureProduct(id, duration);
     }
 }
 

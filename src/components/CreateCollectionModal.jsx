@@ -6,15 +6,19 @@ import CollectionService from '../core/services/CollectionService';
 import UserService from '../core/services/UserService';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { categories as allCategories } from '../data/mockData';
 import Snackbar from './Snackbar';
 import '../styles/CreateCollectionModal.css';
 import '../styles/InviteMemberModal.css';
+
+const categoryOptions = allCategories.filter(c => c !== 'All');
 
 const CreateCollectionModal = ({ isOpen, onClose }) => {
     const [step, setStep] = useState('create'); // 'create' | 'invite'
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [isPrivate, setIsPrivate] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [snackbar, setSnackbar] = useState({ show: false, message: '', type: 'success' });
     const [createdCollectionId, setCreatedCollectionId] = useState(null);
@@ -47,7 +51,7 @@ const CreateCollectionModal = ({ isOpen, onClose }) => {
 
         setLoading(true);
         try {
-            const response = await CollectionService.createCollection(title, desc, isPrivate);
+            const response = await CollectionService.createCollection(title, desc, isPrivate, selectedCategories);
             const newCollection = response?.result || response?.collection || response?.data || response;
             const collectionId = newCollection?._id || newCollection?.id || response?._id || response?.id;
 
@@ -134,6 +138,7 @@ const CreateCollectionModal = ({ isOpen, onClose }) => {
         setTitle('');
         setDesc('');
         setIsPrivate(false);
+        setSelectedCategories([]);
         setStep('create');
         setCreatedCollectionId(null);
         setInvitedUsers([]);
@@ -199,6 +204,25 @@ const CreateCollectionModal = ({ isOpen, onClose }) => {
                                         rows={4}
                                         maxLength={500}
                                     />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Categories</label>
+                                    <div className="category-select-group">
+                                        {categoryOptions.map(cat => (
+                                            <button
+                                                key={cat}
+                                                type="button"
+                                                className={`category-pill-btn${selectedCategories.includes(cat) ? ' selected' : ''}`}
+                                                onClick={() => setSelectedCategories(prev =>
+                                                    prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                                                )}
+                                                disabled={loading}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="privacy-toggle-row">

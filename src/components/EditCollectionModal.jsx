@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader } from 'lucide-react';
 import CollectionService from '../core/services/CollectionService';
+import { categories as allCategories } from '../data/mockData';
 import Snackbar from './Snackbar';
 import '../styles/CreateCollectionModal.css';
+
+const categoryOptions = allCategories.filter(c => c !== 'All');
 
 const EditCollectionModal = ({ isOpen, onClose, collection, onUpdate }) => {
     const [name, setName] = useState('');
     const [desc, setDesc] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [snackbar, setSnackbar] = useState({ show: false, message: '', type: 'success' });
 
@@ -15,6 +19,7 @@ const EditCollectionModal = ({ isOpen, onClose, collection, onUpdate }) => {
         if (collection) {
             setName(collection.title || '');
             setDesc(collection.desc || '');
+            setSelectedCategories(collection.category || []);
         }
     }, [collection]);
 
@@ -28,12 +33,12 @@ const EditCollectionModal = ({ isOpen, onClose, collection, onUpdate }) => {
 
         setLoading(true);
         try {
-            await CollectionService.updateCollection(collection._id, name, desc);
+            await CollectionService.updateCollection(collection._id, name, desc, selectedCategories);
             setSnackbar({ show: true, message: 'Collection updated successfully!', type: 'success' });
 
             // Notify parent component to refresh data instantly
             // Pass the updated partial data so parent can optimistically update
-            onUpdate({ ...collection, title: name, desc: desc });
+            onUpdate({ ...collection, title: name, desc: desc, category: selectedCategories });
 
             setTimeout(() => {
                 onClose();
@@ -112,6 +117,25 @@ const EditCollectionModal = ({ isOpen, onClose, collection, onUpdate }) => {
                                 rows={4}
                                 maxLength={500}
                             />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Categories</label>
+                            <div className="category-select-group">
+                                {categoryOptions.map(cat => (
+                                    <button
+                                        key={cat}
+                                        type="button"
+                                        className={`category-pill-btn${selectedCategories.includes(cat) ? ' selected' : ''}`}
+                                        onClick={() => setSelectedCategories(prev =>
+                                            prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                                        )}
+                                        disabled={loading}
+                                    >
+                                        {cat}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="modal-actions">

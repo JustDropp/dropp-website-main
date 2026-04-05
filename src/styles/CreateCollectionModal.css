@@ -675,3 +675,34 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ─── Category Pill Multi-Select ─────────────────────────────────────────────── */
+.category-select-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.category-pill-btn {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-pill-btn.selected {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.category-pill-btn:hover:not(.selected) {
+    border-color: var(--color-accent);
+    color: var(--text-primary);
+}

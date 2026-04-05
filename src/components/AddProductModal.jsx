@@ -1,15 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader, Link as LinkIcon, Image as ImageIcon, Type, FileText, Upload, Trash2, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Loader, Link as LinkIcon, Image as ImageIcon, Type, FileText, Upload, Trash2, Plus, ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import CollectionService from '../core/services/CollectionService';
 import ProductService from '../core/services/ProductService';
 import { compressImage, isWithinSizeLimit, getTotalSizeMB } from '../utils/mediaUtils';
 import Snackbar from './Snackbar';
+import { categories as allCategories } from '../data/mockData';
 import '../styles/CreateCollectionModal.css';
 
 const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = false, onProductAdded, productToEdit = null }) => {
     const isEditMode = !!productToEdit;
+    const categoryOptions = allCategories.filter(c => c !== 'All');
     const [name, setName] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState([]);
     const [links, setLinks] = useState(['']);
     const [description, setDescription] = useState('');
     const [mediaFiles, setMediaFiles] = useState([]);
@@ -26,6 +29,7 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
         if (isOpen && productToEdit) {
             setName(productToEdit.name || productToEdit.title || '');
             setDescription(productToEdit.desc || productToEdit.description || '');
+            setSelectedCategories(productToEdit.category || []);
             setRemovedMediaIds([]);
 
             // Handle links
@@ -206,6 +210,11 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
             return;
         }
 
+        if (selectedCategories.length === 0) {
+            setSnackbar({ show: true, message: 'Please select at least one category', type: 'error' });
+            return;
+        }
+
         // Validate all non-empty links
         for (const link of validLinks) {
             try {
@@ -257,7 +266,8 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                     const updateData = {
                         name: name.trim(),
                         link: validLinks.join(','),
-                        desc: description.trim()
+                        desc: description.trim(),
+                        category: selectedCategories
                     };
                     promises.push(ProductService.updateProduct(productId, updateData));
                 }
@@ -289,6 +299,9 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                 createFormData.append('link', validLinks.join(','));
                 createFormData.append('desc', description.trim());
                 createFormData.append('isCollectionPrivate', String(isCollectionPrivate));
+                selectedCategories.forEach(cat => {
+                    createFormData.append('category', cat);
+                });
                 
                 // Append all media files to the creation request
                 processedFiles.forEach(file => {
@@ -326,6 +339,7 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
         setDescription('');
         setLinks(['']);
         setDescription('');
+        setSelectedCategories([]);
         removeAllMedia();
         setCurrentMediaIndex(0);
     };
@@ -566,6 +580,28 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                                             rows={4}
                                             className="compact-input"
                                         />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            <Tag size={16} />
+                                            Category *
+                                        </label>
+                                        <div className="category-select-group">
+                                            {categoryOptions.map(cat => (
+                                                <button
+                                                    key={cat}
+                                                    type="button"
+                                                    className={`category-pill-btn${selectedCategories.includes(cat) ? ' selected' : ''}`}
+                                                    onClick={() => setSelectedCategories(prev =>
+                                                        prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                                                    )}
+                                                    disabled={loading}
+                                                >
+                                                    {cat}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="right-panel-actions">

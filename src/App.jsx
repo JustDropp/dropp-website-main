@@ -84,7 +84,7 @@ const AnimatedRoutes = () => {
         } />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
-        <Route path="/reset-passowrd" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmailToken />} />
         <Route path="/verify-email" element={<VerifyEmailToken />} />
 
@@ -135,7 +135,6 @@ const AppContent = () => {
   // Only show custom cursor on landing page, not on login/signup
   const isAuthPage = ['/login', '/signup', '/forgot-password'].includes(location.pathname)
     || location.pathname.startsWith('/reset-password')
-    || location.pathname.startsWith('/reset-passowrd')
     || location.pathname.startsWith('/verify-email');
   const showCustomCursor = !isAuthenticated && !isAuthPage;
   const isLandingPage = location.pathname === '/landing';

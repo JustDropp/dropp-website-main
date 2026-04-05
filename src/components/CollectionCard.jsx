@@ -116,7 +116,9 @@ const CollectionCard = ({
             .map(p => {
                 const media = p.media || [];
                 if (media.length > 0) {
-                    const url = media[0];
+                    const raw = media[0];
+                    const url = typeof raw === 'object' ? raw.url : raw;
+                    if (!url || typeof url !== 'string') return null;
                     return url.startsWith('http') ? url : API_CONFIG.BASE_URL + url;
                 }
                 // Fallback fields some endpoints might use

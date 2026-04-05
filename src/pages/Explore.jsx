@@ -3,7 +3,9 @@ import { motion } from 'framer-motion';
 import { Search, Grid, Loader, X } from 'lucide-react';
 import FloatingActionButton from '../components/FloatingActionButton';
 import CollectionService from '../core/services/CollectionService';
+import ProductService from '../core/services/ProductService';
 import CollectionCard from '../components/CollectionCard';
+import ProductCard from '../components/ProductCard';
 import { ShimmerCollectionGrid } from '../components/Shimmer';
 import { categories } from '../data/mockData';
 import '../styles/Explore.css';
@@ -11,15 +13,20 @@ import '../styles/Profile.css';
 
 const Explore = () => {
     const [activeCategory, setActiveCategory] = useState('All');
+    const [activeTab, setActiveTab] = useState('collections');
     const [collections, setCollections] = useState([]);
+    const [products, setProducts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [productSearchResults, setProductSearchResults] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [productsLoading, setProductsLoading] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         fetchCollections();
+        fetchProducts();
     }, []);
 
     // Debounce search
@@ -29,11 +36,17 @@ const Explore = () => {
                 setIsSearching(true);
                 setSearchLoading(true);
                 try {
-                    const results = await CollectionService.searchCollections(searchQuery);
-                    setSearchResults(results);
+                    if (activeTab === 'products') {
+                        const productResults = await ProductService.searchProducts(searchQuery);
+                        setProductSearchResults(Array.isArray(productResults) ? productResults : []);
+                    } else {
+                        const results = await CollectionService.searchCollections(searchQuery);
+                        setSearchResults(results);
+                    }
                 } catch (error) {
                     console.error('Search failed:', error);
                     setSearchResults([]);
+                    setProductSearchResults([]);
                 } finally {
                     setSearchLoading(false);
                 }
@@ -44,7 +57,7 @@ const Explore = () => {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, activeTab]);
 
     const fetchCollections = async () => {
         try {
@@ -58,12 +71,25 @@ const Explore = () => {
         }
     };
 
+    const fetchProducts = async () => {
+        try {
+            setProductsLoading(true);
+            const data = await ProductService.getExploreProducts();
+            setProducts(Array.isArray(data) ? data : data?.results || []);
+        } catch (error) {
+            console.error('Failed to fetch products:', error);
+        } finally {
+            setProductsLoading(false);
+        }
+    };
+
     const handleCategoryChange = (category) => {
         setActiveCategory(category);
         // TODO: Implement category filtering when backend supports it
     };
 
     const displayedCollections = isSearching ? (Array.isArray(searchResults) ? searchResults : []) : (Array.isArray(collections) ? collections : []);
+    const displayedProducts = isSearching ? (Array.isArray(productSearchResults) ? productSearchResults : []) : (Array.isArray(products) ? products : []);
 
     return (
         <motion.div
@@ -74,7 +100,7 @@ const Explore = () => {
             transition={{ duration: 0.5 }}
         >
             <div className="explore-header">
-                <h1 className="explore-title">Explore <span className="accent">collections.</span></h1>
+                <h1 className="explore-title">Explore <span className="accent">{activeTab === 'collections' ? 'collections.' : 'products.'}</span></h1>
 
                 <div className="explore-search">
                     <Search size={20} />
@@ -96,6 +122,21 @@ const Explore = () => {
                 </div>
             </div>
 
+            <div className="explore-tabs">
+                <button
+                    className={`explore-tab ${activeTab === 'collections' ? 'active' : ''}`}
+                    onClick={() => { setActiveTab('collections'); setSearchQuery(''); }}
+                >
+                    Collections
+                </button>
+                <button
+                    className={`explore-tab ${activeTab === 'products' ? 'active' : ''}`}
+                    onClick={() => { setActiveTab('products'); setSearchQuery(''); }}
+                >
+                    Products
+                </button>
+            </div>
+
             {!isSearching && (
                 <div className="category-filters">
                     {categories.map((category) => (
@@ -113,13 +154,13 @@ const Explore = () => {
             <div className="explore-content">
                 {isSearching && (
                     <h2 className="search-results-title">
-                        {searchLoading ? 'Searching...' : `Search Results (${searchResults.length})`}
+                        {searchLoading ? 'Searching...' : `Search Results (${activeTab === 'products' ? productSearchResults.length : searchResults.length})`}
                     </h2>
                 )}
 
-                {loading || searchLoading ? (
+                {(activeTab === 'collections' ? loading : productsLoading) || searchLoading ? (
                     <ShimmerCollectionGrid count={8} />
-                ) : (
+                ) : activeTab === 'collections' ? (
                     <div className="pinterest-grid">
                         {displayedCollections.map((collection) => (
                             <CollectionCard
@@ -131,6 +172,21 @@ const Explore = () => {
                             <div className="no-results">
                                 <Grid size={48} />
                                 <p>{isSearching ? `No collections found for "${searchQuery}"` : 'No collections found'}</p>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="pinterest-grid">
+                        {displayedProducts.map((product) => (
+                            <ProductCard
+                                key={product._id || product.id}
+                                product={product}
+                            />
+                        ))}
+                        {displayedProducts.length === 0 && (
+                            <div className="no-results">
+                                <Grid size={48} />
+                                <p>{isSearching ? `No products found for "${searchQuery}"` : 'No products found'}</p>
                             </div>
                         )}
                     </div>

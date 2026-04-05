@@ -120,8 +120,15 @@ const Analytics = () => {
     const collectionRows = useMemo(() => analytics?.collections?.data ?? [], [analytics]);
     const productRows = useMemo(() => analytics?.products?.data ?? [], [analytics]);
 
-    const totalViews = analytics?.collections?.total_views || 0;
-    const totalLikes = analytics?.products?.likes_count || 0;
+    const totalViews = (analytics?.collections?.total_views || 0) + (analytics?.products?.total_views || 0);
+    const totalLikes = (analytics?.collections?.likes_count || 0) + (analytics?.products?.likes_count || 0);
+
+    const collectionViewsTrend = useMemo(() =>
+        analytics?.collections?.views_over_time?.by_month || [], [analytics]);
+    const productViewsTrend = useMemo(() =>
+        analytics?.products?.views_over_time?.by_month || [], [analytics]);
+    const viewsTrendRows = useMemo(() =>
+        [...collectionViewsTrend, ...productViewsTrend], [collectionViewsTrend, productViewsTrend]);
 
     const kpis = useMemo(() => {
         const rows = collectionRows;
@@ -190,13 +197,13 @@ const Analytics = () => {
                             />
                             <StatCard
                                 icon={Eye}
-                                label="Collection views"
+                                label="Total views"
                                 value={totalViews}
                                 delay={0.1}
                             />
                             <StatCard
                                 icon={Heart}
-                                label="Product likes"
+                                label="Total likes"
                                 value={totalLikes}
                                 delay={0.15}
                             />
@@ -271,6 +278,35 @@ const Analytics = () => {
                             </div>
                         </section>
 
+                        {viewsTrendRows.length > 0 && (
+                            <section className="analytics-dual-panels">
+                                <div className="analytics-panel analytics-panel--tight">
+                                    <h2 className="analytics-panel-title">
+                                        <TrendingUp size={18} strokeWidth={2} />
+                                        Collection views trend
+                                    </h2>
+                                    <BarList
+                                        rows={collectionViewsTrend}
+                                        valueKey="views"
+                                        labelKey="month"
+                                        emptyMessage="No collection view data yet."
+                                    />
+                                </div>
+                                <div className="analytics-panel analytics-panel--tight">
+                                    <h2 className="analytics-panel-title">
+                                        <TrendingUp size={18} strokeWidth={2} />
+                                        Product views trend
+                                    </h2>
+                                    <BarList
+                                        rows={productViewsTrend}
+                                        valueKey="views"
+                                        labelKey="month"
+                                        emptyMessage="No product view data yet."
+                                    />
+                                </div>
+                            </section>
+                        )}
+
                         <section className="analytics-dual-panels">
                             <div className="analytics-panel analytics-panel--tight">
                                 <h2 className="analytics-panel-title">
@@ -321,6 +357,19 @@ const Analytics = () => {
                                 valueKey="likes"
                                 labelKey="name"
                                 emptyMessage="No product analytics yet — add products to your collections."
+                            />
+                        </section>
+
+                        <section className="analytics-panel analytics-panel--wide">
+                            <h2 className="analytics-panel-title">
+                                <Eye size={18} strokeWidth={2} />
+                                Product views by drop
+                            </h2>
+                            <BarList
+                                rows={productRows}
+                                valueKey="views"
+                                labelKey="name"
+                                emptyMessage="No product view data yet."
                             />
                         </section>
                     </>
