@@ -5,6 +5,7 @@ import { API_CONFIG } from '../core/config/apiConfig';
 import PLACEHOLDER_IMAGE from '../utils/placeholder';
 import CollectionService from '../core/services/CollectionService';
 import Snackbar from './Snackbar';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/Profile.css';
 
 const CollectionCard = ({
@@ -16,10 +17,16 @@ const CollectionCard = ({
     onUpdateCollection,
 }) => {
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
     const [openMenu, setOpenMenu] = useState(false);
     const [showShare, setShowShare] = useState(false);
     const [copied, setCopied] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked] = useState(
+        collection?.likes?.some(like => {
+            const likeUserId = typeof like === 'object' ? (like.user?._id || like.user) : like;
+            return likeUserId?.toString() === (user?._id || user?.id)?.toString();
+        }) || false
+    );
     const [likeCount, setLikeCount] = useState(collection.likes?.length || 0);
     const [isPinned, setIsPinned] = useState(!!collection.isPinned);
     const [pinLoading, setPinLoading] = useState(false);
@@ -71,11 +78,26 @@ const CollectionCard = ({
         }
     };
 
-    const handleLikeClick = (e) => {
+    const handleLikeClick = async (e) => {
         e.stopPropagation();
+        if (!isAuthenticated) {
+            navigate('/login');
+            return;
+        }
+
+        const prevLiked = isLiked;
+        const prevCount = likeCount;
         setIsLiked(!isLiked);
         setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-        // TODO: Implement like API call
+
+        try {
+            await CollectionService.likeCollection(collectionId);
+        } catch (error) {
+            console.error('Failed to like collection:', error);
+            setIsLiked(prevLiked);
+            setLikeCount(prevCount);
+            setSnackbar({ show: true, message: 'Failed to like collection', type: 'error' });
+        }
     };
 
     const handleShareClick = (e) => {
@@ -189,6 +211,15 @@ const CollectionCard = ({
 
                 {/* Hover: share for visitors; owners use footer Pin + Share, here only overflow menu */}
                 <div className="board-actions">
+                    <button
+                        type="button"
+                        className={`board-action-btn like-btn ${isLiked ? 'liked' : ''}`}
+                        onClick={handleLikeClick}
+                        title={isLiked ? 'Unlike' : 'Like'}
+                    >
+                        <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} />
+                    </button>
+
                     {!isOwner && (
                         <button
                             type="button"

@@ -17,7 +17,10 @@ const ProductCard = ({ product, onDelete, isCollectionOwner = false }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isLiked, setIsLiked] = useState(
-        product?.likes?.some(likeId => likeId === user?._id) || false
+        product?.likes?.some(like => {
+            const likeUserId = typeof like === 'object' ? (like.user?._id || like.user) : like;
+            return likeUserId?.toString() === user?._id?.toString();
+        }) || false
     );
     const [likeCount, setLikeCount] = useState(product.likes?.length || 0);
     const [snackbar, setSnackbar] = useState({ show: false, message: '', type: 'success' });

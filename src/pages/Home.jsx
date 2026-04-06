@@ -115,7 +115,12 @@ const Home = () => {
         finally { setLoading(false); }
     };
 
-    const displayedItems = isSearching ? searchResults : products;
+    const filteredProducts = activeCategory === 'All'
+        ? products
+        : products.filter(p =>
+            Array.isArray(p.category) ? p.category.includes(activeCategory) : p.category === activeCategory
+        );
+    const displayedItems = isSearching ? searchResults : filteredProducts;
 
     return (
         <motion.div

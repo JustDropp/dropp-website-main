@@ -85,11 +85,21 @@ const Explore = () => {
 
     const handleCategoryChange = (category) => {
         setActiveCategory(category);
-        // TODO: Implement category filtering when backend supports it
     };
 
-    const displayedCollections = isSearching ? (Array.isArray(searchResults) ? searchResults : []) : (Array.isArray(collections) ? collections : []);
-    const displayedProducts = isSearching ? (Array.isArray(productSearchResults) ? productSearchResults : []) : (Array.isArray(products) ? products : []);
+    const filteredCollections = activeCategory === 'All'
+        ? (Array.isArray(collections) ? collections : [])
+        : (Array.isArray(collections) ? collections : []).filter(c =>
+            Array.isArray(c.category) ? c.category.includes(activeCategory) : c.category === activeCategory
+        );
+    const filteredProducts = activeCategory === 'All'
+        ? (Array.isArray(products) ? products : [])
+        : (Array.isArray(products) ? products : []).filter(p =>
+            Array.isArray(p.category) ? p.category.includes(activeCategory) : p.category === activeCategory
+        );
+
+    const displayedCollections = isSearching ? (Array.isArray(searchResults) ? searchResults : []) : filteredCollections;
+    const displayedProducts = isSearching ? (Array.isArray(productSearchResults) ? productSearchResults : []) : filteredProducts;
 
     return (
         <motion.div
@@ -125,13 +135,13 @@ const Explore = () => {
             <div className="explore-tabs">
                 <button
                     className={`explore-tab ${activeTab === 'collections' ? 'active' : ''}`}
-                    onClick={() => { setActiveTab('collections'); setSearchQuery(''); }}
+                    onClick={() => { setActiveTab('collections'); setSearchQuery(''); setActiveCategory('All'); }}
                 >
                     Collections
                 </button>
                 <button
                     className={`explore-tab ${activeTab === 'products' ? 'active' : ''}`}
-                    onClick={() => { setActiveTab('products'); setSearchQuery(''); }}
+                    onClick={() => { setActiveTab('products'); setSearchQuery(''); setActiveCategory('All'); }}
                 >
                     Products
                 </button>

@@ -66,6 +66,8 @@
 
 .modal-form {
     padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(85vh - 80px);
 }
 
 .form-group {
@@ -682,6 +684,26 @@
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 8px;
+    max-height: 160px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.category-select-group::-webkit-scrollbar {
+    width: 4px;
+}
+
+.category-select-group::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.category-select-group::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.category-select-group::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 
 .category-pill-btn {

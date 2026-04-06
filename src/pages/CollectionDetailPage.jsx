@@ -110,7 +110,10 @@ const CollectionDetailPage = () => {
 
             if (isAuthenticated && user) {
                 const userId = user.id || user._id;
-                const hasLiked = collectionData?.likes?.some(likeId => likeId === userId || likeId?._id === userId);
+                const hasLiked = collectionData?.likes?.some(like => {
+                    const likeUserId = typeof like === 'object' ? (like.user?._id || like.user) : like;
+                    return likeUserId?.toString() === userId?.toString();
+                });
                 setIsLiked(!!hasLiked);
             }
 
