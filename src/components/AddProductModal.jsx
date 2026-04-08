@@ -13,6 +13,8 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
     const categoryOptions = allCategories.filter(c => c !== 'All');
     const [name, setName] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [tagInput, setTagInput] = useState('');
     const [links, setLinks] = useState(['']);
     const [description, setDescription] = useState('');
     const [mediaFiles, setMediaFiles] = useState([]);
@@ -30,6 +32,7 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
             setName(productToEdit.name || productToEdit.title || '');
             setDescription(productToEdit.desc || productToEdit.description || '');
             setSelectedCategories(productToEdit.category || []);
+            setTags(productToEdit.tags || []);
             setRemovedMediaIds([]);
 
             // Handle links
@@ -258,16 +261,21 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                 const promises = [];
 
                 // A. Check if details changed
+                const categoriesChanged = JSON.stringify(selectedCategories.sort()) !== JSON.stringify((productToEdit.category || []).sort());
+                const tagsChanged = JSON.stringify(tags.sort()) !== JSON.stringify((productToEdit.tags || []).sort());
                 const detailsChanged = name.trim() !== (productToEdit.name || productToEdit.title) ||
                     validLinks.join(',') !== productToEdit.link ||
-                    description.trim() !== (productToEdit.desc || productToEdit.description);
+                    description.trim() !== (productToEdit.desc || productToEdit.description) ||
+                    categoriesChanged ||
+                    tagsChanged;
 
                 if (detailsChanged) {
                     const updateData = {
                         name: name.trim(),
                         link: validLinks.join(','),
                         desc: description.trim(),
-                        category: selectedCategories
+                        category: selectedCategories,
+                        tags: tags
                     };
                     promises.push(ProductService.updateProduct(productId, updateData));
                 }
@@ -301,6 +309,9 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                 createFormData.append('isCollectionPrivate', String(isCollectionPrivate));
                 selectedCategories.forEach(cat => {
                     createFormData.append('category', cat);
+                });
+                tags.forEach(tag => {
+                    createFormData.append('tags', tag);
                 });
                 
                 // Append all media files to the creation request
@@ -340,6 +351,8 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
         setLinks(['']);
         setDescription('');
         setSelectedCategories([]);
+        setTags([]);
+        setTagInput('');
         removeAllMedia();
         setCurrentMediaIndex(0);
     };
@@ -602,6 +615,48 @@ const AddProductModal = ({ isOpen, onClose, collectionId, isCollectionPrivate = 
                                                 </button>
                                             ))}
                                         </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            <Tag size={16} />
+                                            Tags
+                                        </label>
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                            <input
+                                                type="text"
+                                                value={tagInput}
+                                                onChange={(e) => setTagInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+                                                        e.preventDefault();
+                                                        const newTag = tagInput.trim().toLowerCase();
+                                                        if (!tags.includes(newTag)) {
+                                                            setTags(prev => [...prev, newTag]);
+                                                        }
+                                                        setTagInput('');
+                                                    }
+                                                }}
+                                                placeholder="Type a tag and press Enter"
+                                                disabled={loading}
+                                                className="compact-input"
+                                                style={{ flex: 1 }}
+                                            />
+                                        </div>
+                                        {tags.length > 0 && (
+                                            <div className="category-select-group" style={{ gap: '0.4rem' }}>
+                                                {tags.map((tag, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="category-pill-btn selected"
+                                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}
+                                                        onClick={() => setTags(prev => prev.filter((_, i) => i !== idx))}
+                                                    >
+                                                        {tag} <X size={12} />
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="right-panel-actions">

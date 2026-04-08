@@ -9,8 +9,8 @@ class ProductRepository {
      * Get explore products (public feed)
      * @returns {Promise<Array>}
      */
-    async getExploreProducts() {
-        const response = await apiClient.get(API_CONFIG.ENDPOINTS.PRODUCT_EXPLORE);
+    async getExploreProducts(page = 0) {
+        const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.PRODUCT_EXPLORE}?page=${page}`);
         return response.data;
     }
 

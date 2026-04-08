@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Share2, MoreHorizontal, Trash2, Link2, Copy, Check, Heart, Edit2, Lock, Pin } from 'lucide-react';
+import { Share2, MoreHorizontal, Trash2, Link2, Copy, Check, Heart, Edit2, Lock, Pin, Sparkles } from 'lucide-react';
 import AddProductModal from './AddProductModal';
 import { API_CONFIG } from '../core/config/apiConfig';
 import PLACEHOLDER_IMAGE from '../utils/placeholder';
@@ -203,6 +203,12 @@ const ProductCard = ({ product, onDelete, isCollectionOwner = false }) => {
                     {product.isPrivate && (
                         <div className="card-privacy-badge">
                             <Lock size={11} /> Private
+                        </div>
+                    )}
+
+                    {(product._feedSource === 'boosted' || product.boostedConfig?.isBoosted) && (
+                        <div className="card-privacy-badge" style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', left: 'auto', right: '8px' }}>
+                            <Sparkles size={11} /> Featured
                         </div>
                     )}
 

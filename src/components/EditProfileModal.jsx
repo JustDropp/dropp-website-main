@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Camera, MapPin, Loader2 } from 'lucide-react';
 import UserService from '../core/services/UserService';
 import { API_CONFIG } from '../core/config/apiConfig';
+import { categories } from '../data/mockData';
 import '../styles/EditProfileModal.css';
 
 const PRONOUNS = [
@@ -13,6 +14,9 @@ const PRONOUNS = [
     "other"
 ];
 
+const GENDERS = ["Male", "Female", "Rather Not to Say"];
+const INTEREST_OPTIONS = categories.filter(c => c !== 'All');
+
 const EditProfileModal = ({ user, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -22,6 +26,8 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
         location: '',
         pronoun: '',
         dob: '',
+        gender: '',
+        interests: [],
         profileImageUrl: ''
     });
 
@@ -49,6 +55,8 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
                 location: user.location || '',
                 pronoun: user.pronoun || '',
                 dob: user.dob ? user.dob.split('T')[0] : '', // Format for date input
+                gender: user.gender || '',
+                interests: user.interests || [],
                 profileImageUrl: user.profileImageUrl || ''
             });
 
@@ -120,6 +128,15 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
         setCustomPronoun(e.target.value);
     };
 
+    const handleInterestToggle = (interest) => {
+        setFormData(prev => ({
+            ...prev,
+            interests: prev.interests.includes(interest)
+                ? prev.interests.filter(i => i !== interest)
+                : [...prev.interests, interest]
+        }));
+    };
+
     const handleLocationSearch = (query) => {
         if (locationTimerRef.current) {
             clearTimeout(locationTimerRef.current);
@@ -177,6 +194,15 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
             data.append('location', formData.location);
             data.append('link', formData.link);
             data.append('dob', formData.dob);
+
+            if (formData.gender) {
+                data.append('gender', formData.gender);
+            }
+            if (formData.interests.length > 0) {
+                formData.interests.forEach(interest => {
+                    data.append('interests', interest);
+                });
+            }
 
             // Handle Username
             if (formData.username !== user.username) {
@@ -373,6 +399,47 @@ const EditProfileModal = ({ user, onClose, onUpdate }) => {
                                 value={formData.dob}
                                 onChange={handleInputChange}
                             />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Gender</label>
+                            <select
+                                name="gender"
+                                className="form-select"
+                                value={formData.gender}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Select gender</option>
+                                {GENDERS.map(g => (
+                                    <option key={g} value={g}>{g}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Interests</label>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {INTEREST_OPTIONS.map(interest => (
+                                    <button
+                                        key={interest}
+                                        type="button"
+                                        onClick={() => handleInterestToggle(interest)}
+                                        style={{
+                                            padding: '0.4rem 0.85rem',
+                                            borderRadius: '20px',
+                                            border: formData.interests.includes(interest) ? '1.5px solid var(--accent-blue, #3b82f6)' : '1px solid var(--border-color, #333)',
+                                            background: formData.interests.includes(interest) ? 'var(--accent-blue, #3b82f6)' : 'transparent',
+                                            color: formData.interests.includes(interest) ? '#fff' : 'var(--text-secondary, #aaa)',
+                                            fontSize: '0.8rem',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            fontWeight: formData.interests.includes(interest) ? '500' : '400'
+                                        }}
+                                    >
+                                        {interest}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 

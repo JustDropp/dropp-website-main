@@ -25,6 +25,8 @@ export class UserProfile {
         this.updatedAt = data.updatedAt;
         this.usernameLastUpdated = data.usernameLastUpdated;
         this.emailVerified = data.emailVerified;
+        this.gender = data.gender;
+        this.interests = data.interests || [];
     }
 
     static fromJSON(json) {

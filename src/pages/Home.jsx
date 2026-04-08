@@ -6,6 +6,7 @@ import ProductMasonryGrid from '../components/ProductMasonryGrid';
 import HomeAnalyticsMarquee from '../components/HomeAnalyticsMarquee';
 import { ShimmerCollectionGrid } from '../components/Shimmer';
 import FloatingActionButton from '../components/FloatingActionButton';
+import OnboardingModal from '../components/OnboardingModal';
 import ProductService from '../core/services/ProductService';
 import UserService from '../core/services/UserService';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,6 +39,7 @@ const Home = () => {
     const [analyticsLoading, setAnalyticsLoading] = useState(true);
     /** Fresh profile from API so avatar matches /profile (JWT often omits or stale-dates image) */
     const [me, setMe] = useState(null);
+    const [showOnboarding, setShowOnboarding] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -48,7 +50,13 @@ const Home = () => {
         (async () => {
             try {
                 const profile = await UserService.getUserProfile();
-                if (!cancelled) setMe(profile);
+                if (!cancelled) {
+                    setMe(profile);
+                    const skipped = sessionStorage.getItem('dropp_onboarding_skipped');
+                    if (!skipped && !profile.gender && (!profile.interests || profile.interests.length === 0)) {
+                        setShowOnboarding(true);
+                    }
+                }
             } catch {
                 if (!cancelled) setMe(null);
             }
@@ -109,8 +117,9 @@ const Home = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const data = await ProductService.getExploreProducts();
-            setProducts(data);
+            const response = await ProductService.getExploreProducts();
+            const items = Array.isArray(response) ? response : response?.data || [];
+            setProducts(items);
         } catch { /* noop */ }
         finally { setLoading(false); }
     };
@@ -281,6 +290,19 @@ const Home = () => {
             </div>
 
             <FloatingActionButton />
+
+            {showOnboarding && (
+                <OnboardingModal
+                    onClose={() => setShowOnboarding(false)}
+                    onComplete={async () => {
+                        try {
+                            const profile = await UserService.getUserProfile();
+                            setMe(profile);
+                            fetchProducts();
+                        } catch { /* noop */ }
+                    }}
+                />
+            )}
         </motion.div>
     );
 };

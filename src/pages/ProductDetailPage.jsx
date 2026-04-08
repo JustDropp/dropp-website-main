@@ -194,14 +194,20 @@ const ProductDetailPage = () => {
         }
     };
 
-    const isFeatured = product?.featuredUntil && new Date(product.featuredUntil) > new Date();
+    const isFeatured = product?.boostedConfig?.isBoosted && product?.boostedConfig?.boostedUntil && new Date(product.boostedConfig.boostedUntil) > new Date();
 
     const handleFeatureProduct = async () => {
         if (!isOwner || featureLoading || isFeatured) return;
         setFeatureLoading(true);
         try {
             await ProductService.featureProduct(id, 24);
-            setProduct((prev) => ({ ...prev, featuredUntil: new Date(Date.now() + 24*60*60*1000).toISOString() }));
+            setProduct((prev) => ({
+                ...prev,
+                boostedConfig: {
+                    isBoosted: true,
+                    boostedUntil: new Date(Date.now() + 24*60*60*1000).toISOString()
+                }
+            }));
             setSnackbar({ show: true, message: 'Product marked as featured', type: 'success' });
         } catch (error) {
             setSnackbar({ show: true, message: 'Failed to update featured status', type: 'error' });

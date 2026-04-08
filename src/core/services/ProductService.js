@@ -8,10 +8,10 @@ class ProductService {
      * Get explore products (public feed)
      * @returns {Promise<Array>}
      */
-    async getExploreProducts() {
+    async getExploreProducts(page = 0) {
         try {
-            const response = await ProductRepository.getExploreProducts();
-            return response.results || [];
+            const response = await ProductRepository.getExploreProducts(page);
+            return response;
         } catch (error) {
             console.error('ProductService.getExploreProducts error:', error);
             throw error;

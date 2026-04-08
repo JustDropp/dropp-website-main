@@ -215,21 +215,7 @@ const Settings = () => {
                         <button className="settings-btn" onClick={() => setIsPasswordModalOpen(true)}>Update</button>
                     </div>
 
-                    <div className="settings-item">
-                        <div className="settings-item-content">
-                            <h3>Two-Factor Authentication</h3>
-                            <p>Add an extra layer of security</p>
-                        </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Two-factor authentication coming soon', 'info')}>Enable</button>
-                    </div>
 
-                    <div className="settings-item">
-                        <div className="settings-item-content">
-                            <h3>Privacy Settings</h3>
-                            <p>Control who can see your profile and collections</p>
-                        </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Privacy settings coming soon', 'info')}>Manage</button>
-                    </div>
                 </section>
 
                 {/* Notifications */}
@@ -293,7 +279,6 @@ const Settings = () => {
                             <h3>Language</h3>
                             <p>English (US)</p>
                         </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Language settings coming soon', 'info')}>Change</button>
                     </div>
 
                     <div className="settings-item">
@@ -301,7 +286,6 @@ const Settings = () => {
                             <h3>Time Zone</h3>
                             <p>Automatic</p>
                         </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Timezone settings coming soon', 'info')}>Change</button>
                     </div>
                 </section>
 
@@ -317,7 +301,7 @@ const Settings = () => {
                             <h3>Help Center</h3>
                             <p>Get answers to your questions</p>
                         </div>
-                        <button className="settings-btn" onClick={() => window.open('https://ondropp.app', '_blank')}>Visit</button>
+                        <button className="settings-btn" onClick={() => navigate('/help')}>Visit</button>
                     </div>
 
                     <div className="settings-item">
@@ -325,7 +309,7 @@ const Settings = () => {
                             <h3>Contact Support</h3>
                             <p>Reach out to our team</p>
                         </div>
-                        <button className="settings-btn" onClick={() => window.open('mailto:support@ondropp.app', '_blank')}>Contact</button>
+                        <button className="settings-btn" onClick={() => window.open('mailto:ondropp.app@gmail.com')}>Contact</button>
                     </div>
 
                     <div className="settings-item">
@@ -333,7 +317,7 @@ const Settings = () => {
                             <h3>Terms of Service</h3>
                             <p>Read our terms and policies</p>
                         </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Terms of Service page coming soon', 'info')}>View</button>
+                        <button className="settings-btn" onClick={() => navigate('/terms')}>View</button>
                     </div>
                 </section>
 
@@ -362,24 +346,27 @@ const Settings = () => {
 
                     <div className="settings-item">
                         <div className="settings-item-content">
-                            <h3>Careers</h3>
-                            <p>Join our growing team</p>
+                            <h3>Meet Our Team</h3>
+                            <p>The people behind Dropp</p>
                         </div>
-                        <button className="settings-btn" onClick={() => showSnackbar('Careers page coming soon', 'info')}>Explore</button>
+                        <button className="settings-btn" onClick={() => navigate('/about')}>View</button>
                     </div>
 
                     <div className="settings-links-row">
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="settings-social-link">
-                            Twitter
+                        <a href="https://x.com/ondropp" target="_blank" rel="noopener noreferrer" className="settings-social-link">
+                            Twitter / X
                         </a>
-                        <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="settings-social-link">
-                            TikTok
+                        <a href="https://instagram.com/ondropp" target="_blank" rel="noopener noreferrer" className="settings-social-link">
+                            Instagram
+                        </a>
+                        <a href="https://linkedin.com/company/ondropp" target="_blank" rel="noopener noreferrer" className="settings-social-link">
+                            LinkedIn
                         </a>
                     </div>
 
                     <div className="settings-links-row">
-                        <a href="#" className="settings-legal-link" onClick={(e) => { e.preventDefault(); showSnackbar('Privacy Policy coming soon', 'info'); }}>Privacy Policy</a>
-                        <a href="#" className="settings-legal-link" onClick={(e) => { e.preventDefault(); showSnackbar('Terms of Service coming soon', 'info'); }}>Terms of Service</a>
+                        <a href="/privacy" className="settings-legal-link" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }}>Privacy Policy</a>
+                        <a href="/terms" className="settings-legal-link" onClick={(e) => { e.preventDefault(); navigate('/terms'); }}>Terms of Service</a>
                     </div>
                 </section>
 

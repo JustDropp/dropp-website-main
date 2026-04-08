@@ -23,6 +23,8 @@ const Explore = () => {
     const [productsLoading, setProductsLoading] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
 
     useEffect(() => {
         fetchCollections();
@@ -71,16 +73,28 @@ const Explore = () => {
         }
     };
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (pageNum = 0) => {
         try {
             setProductsLoading(true);
-            const data = await ProductService.getExploreProducts();
-            setProducts(Array.isArray(data) ? data : data?.results || []);
+            const response = await ProductService.getExploreProducts(pageNum);
+            const items = Array.isArray(response?.data) ? response.data : [];
+            if (pageNum === 0) {
+                setProducts(items);
+            } else {
+                setProducts(prev => [...prev, ...items]);
+            }
+            setHasMore(items.length >= 20);
         } catch (error) {
             console.error('Failed to fetch products:', error);
         } finally {
             setProductsLoading(false);
         }
+    };
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchProducts(nextPage);
     };
 
     const handleCategoryChange = (category) => {
@@ -135,13 +149,13 @@ const Explore = () => {
             <div className="explore-tabs">
                 <button
                     className={`explore-tab ${activeTab === 'collections' ? 'active' : ''}`}
-                    onClick={() => { setActiveTab('collections'); setSearchQuery(''); setActiveCategory('All'); }}
+                    onClick={() => { setActiveTab('collections'); setSearchQuery(''); setActiveCategory('All'); setPage(0); setProducts([]); setHasMore(true); }}
                 >
                     Collections
                 </button>
                 <button
                     className={`explore-tab ${activeTab === 'products' ? 'active' : ''}`}
-                    onClick={() => { setActiveTab('products'); setSearchQuery(''); setActiveCategory('All'); }}
+                    onClick={() => { setActiveTab('products'); setSearchQuery(''); setActiveCategory('All'); setPage(0); setHasMore(true); fetchProducts(0); }}
                 >
                     Products
                 </button>
@@ -200,6 +214,12 @@ const Explore = () => {
                             </div>
                         )}
                     </div>
+                )}
+
+                {activeTab === 'products' && !isSearching && hasMore && !productsLoading && products.length > 0 && (
+                    <button className="load-more-btn" onClick={handleLoadMore} style={{ display: 'block', margin: '2rem auto', padding: '0.75rem 2rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+                        Load More
+                    </button>
                 )}
             </div>
 

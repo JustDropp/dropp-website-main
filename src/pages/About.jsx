@@ -117,6 +117,59 @@ const About = () => {
                     </div>
                 </section>
 
+                {/* Meet Our Team */}
+                <section className="about-section">
+                    <h2 className="section-title">Meet Our Team</h2>
+                    <p className="section-content">
+                        The passionate people behind Dropp who are building the future of social curation.
+                    </p>
+                    <div className="features-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                        {[
+                            { name: 'Team Member', role: 'Founder & CEO' },
+                            { name: 'Team Member', role: 'Co-Founder & CTO' },
+                            { name: 'Team Member', role: 'Lead Designer' },
+                            { name: 'Team Member', role: 'Full Stack Developer' },
+                        ].map((member, index) => (
+                            <motion.div
+                                key={index}
+                                className="feature-card"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                                style={{ padding: 'var(--spacing-md)', textAlign: 'center' }}
+                            >
+                                <div style={{
+                                    width: '80px',
+                                    height: '80px',
+                                    borderRadius: '50%',
+                                    background: 'var(--accent-gradient)',
+                                    margin: '0 auto var(--spacing-sm)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    fontSize: '1.5rem',
+                                    fontWeight: '700',
+                                    fontFamily: 'var(--font-display)',
+                                }}>
+                                    {member.name.charAt(0)}
+                                </div>
+                                <h3 style={{
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    fontFamily: 'var(--font-display)',
+                                    color: 'var(--text-primary)',
+                                    marginBottom: '0.25rem',
+                                }}>{member.name}</h3>
+                                <p style={{
+                                    fontSize: '0.85rem',
+                                    color: 'var(--text-secondary)',
+                                }}>{member.role}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+
                 {/* Vision Section */}
                 <section className="about-section about-vision">
                     <h2 className="section-title">Our Vision</h2>
@@ -128,6 +181,39 @@ const About = () => {
                     <p className="section-content">
                         Join us in building the future of social commerce—one collection at a time.
                     </p>
+                </section>
+
+                {/* Connect With Us */}
+                <section className="about-section" style={{ textAlign: 'center' }}>
+                    <h2 className="section-title">Connect With Us</h2>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--spacing-md)', flexWrap: 'wrap', marginTop: 'var(--spacing-md)' }}>
+                        {[
+                            { label: 'Twitter / X', href: 'https://x.com/ondropp' },
+                            { label: 'Instagram', href: 'https://instagram.com/ondropp' },
+                            { label: 'LinkedIn', href: 'https://linkedin.com/company/ondropp' },
+                        ].map((link) => (
+                            <a
+                                key={link.label}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: 'var(--glass-bg)',
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: 'var(--radius-lg)',
+                                    color: 'var(--text-primary)',
+                                    textDecoration: 'none',
+                                    fontSize: '0.9rem',
+                                    fontWeight: '500',
+                                    fontFamily: 'var(--font-display)',
+                                    transition: 'all 0.2s ease',
+                                }}
+                            >
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
                 </section>
             </div>
         </motion.div>
