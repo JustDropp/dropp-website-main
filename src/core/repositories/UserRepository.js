@@ -12,7 +12,7 @@ class UserRepository {
      */
     async getUserProfile() {
         try {
-            const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE);
+            const response = await apiClient.get(API_CONFIG.ENDPOINTS.MY_PROFILE);
             return UserProfile.fromJSON(response.data);
         } catch (error) {
             throw error;
@@ -26,7 +26,7 @@ class UserRepository {
      */
     async updateProfile(formData) {
         try {
-            const response = await apiClient.patch(API_CONFIG.ENDPOINTS.PROFILE, formData, {
+            const response = await apiClient.patch(API_CONFIG.ENDPOINTS.MY_PROFILE, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -137,7 +137,7 @@ class UserRepository {
      */
     async followUser(userId) {
         try {
-            const response = await apiClient.get(`${API_CONFIG.ENDPOINTS.FOLLOW_USER}/${userId}`);
+            const response = await apiClient.post(`${API_CONFIG.ENDPOINTS.FOLLOW_USER}/${userId}`);
             return response.data;
         } catch (error) {
             throw error;
@@ -231,6 +231,31 @@ class UserRepository {
     async getAllUsers() {
         try {
             const response = await apiClient.get(API_CONFIG.ENDPOINTS.USERS);
+            return response.data?.results || [];
+        } catch (error) {
+            throw error;
+        }
+    }
+    /**
+     * Get profile views
+     * @returns {Promise<Object>}
+     */
+    async getProfileViews() {
+        try {
+            const response = await apiClient.get(API_CONFIG.ENDPOINTS.PROFILE_VIEWS);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Get liked products
+     * @returns {Promise<Array>}
+     */
+    async getLikedProducts() {
+        try {
+            const response = await apiClient.get(API_CONFIG.ENDPOINTS.LIKED_PRODUCTS);
             return response.data?.results || [];
         } catch (error) {
             throw error;

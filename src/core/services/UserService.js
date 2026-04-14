@@ -203,6 +203,14 @@ class UserService {
     async resetPassword(id, token, password) {
         return UserRepository.resetPassword(id, token, password);
     }
+
+    async getProfileViews() {
+        return UserRepository.getProfileViews();
+    }
+
+    async getLikedProducts() {
+        return UserRepository.getLikedProducts();
+    }
 }
 
 export default new UserService();

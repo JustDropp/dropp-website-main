@@ -5,7 +5,8 @@ export const API_CONFIG = {
     ENDPOINTS: {
         LOGIN: '/user/login',
         SIGNUP: '/user/signup',
-        PROFILE: '/user/profile/',
+        PROFILE: '/user/profile',
+        MY_PROFILE: '/user/me',
         VERIFY_EMAIL: '/user/verify-email',
         VERIFY_EMAIL_TOKEN: '/user/verify-token',
         UPDATE_PASSWORD: '/user/update-password',
@@ -16,7 +17,7 @@ export const API_CONFIG = {
         COLLECTIONS: '/c',
         COLLECTION_BY_ID: '/c/getCollectionById',
         EXPLORE: '/c/explore/collections',
-        USERS: '/user/',
+        USERS: '/user/all',
         FOLLOW_USER: '/user/follow',
         FOLLOWERS: '/user/followers',
         FOLLOWING: '/user/following',
@@ -39,6 +40,15 @@ export const API_CONFIG = {
         INVITE_MEMBER: '/c/invite', // PATCH /c/invite/{collectionId}
         REVOKE_MEMBER: '/c/revokeMember', // DELETE /c/revokeMember/{collectionId} body: { memberId }
         PIN_COLLECTION: '/c/pin', // PATCH /c/pin/{collectionId}
+        PROFILE_VIEWS: '/user/profile-views',
+        LIKED_PRODUCTS: '/user/liked/products',
+        SUBSCRIPTION_CREATE: '/subscription/create',
+        SUBSCRIPTION_VERIFY: '/subscription/verify',
+        BRAND_SIGNUP: '/brand/signup',
+        BRAND_LOGIN: '/brand/login',
+        BRAND_PROFILE: '/brand',
+        BRAND_UPDATE: '/brand/update',
+        BRAND_DELETE: '/brand/delete',
     },
     TIMEOUT: 10000,
 };

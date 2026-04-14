@@ -13,6 +13,8 @@ import {
     Sun,
     BarChart3,
     Plus,
+    Heart,
+    Eye,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -39,6 +41,8 @@ const Sidebar = () => {
         { path: '/profile/me', label: 'Profile', icon: User },
         { path: '/notifications', label: 'Notifications', icon: Bell },
         { path: '/analytics', label: 'Analytics', icon: BarChart3 },
+        { path: '/profile-views', label: 'Profile Views', icon: Eye },
+        { path: '/liked-products', label: 'Liked', icon: Heart },
         { path: '/settings', label: 'Settings', icon: SettingsIcon },
     ] : [];
 

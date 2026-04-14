@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     Bell, Settings as SettingsIcon, User, Lock, Moon, Sun, Monitor,
-    Globe, HelpCircle, AlertCircle, BadgeCheck,
+    Globe, HelpCircle, AlertCircle, BadgeCheck, Crown, Eye, Heart,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
@@ -272,6 +272,30 @@ const Settings = () => {
                             <p>View collection and product performance</p>
                         </div>
                         <button className="settings-btn" onClick={() => navigate('/analytics')}>Open</button>
+                    </div>
+
+                    <div className="settings-item">
+                        <div className="settings-item-content">
+                            <h3>Profile Views</h3>
+                            <p>See who visited your profile</p>
+                        </div>
+                        <button className="settings-btn" onClick={() => navigate('/profile-views')}>View</button>
+                    </div>
+
+                    <div className="settings-item">
+                        <div className="settings-item-content">
+                            <h3>Liked Products</h3>
+                            <p>Products you've shown love to</p>
+                        </div>
+                        <button className="settings-btn" onClick={() => navigate('/liked-products')}>View</button>
+                    </div>
+
+                    <div className="settings-item">
+                        <div className="settings-item-content">
+                            <h3>Subscription & Plans</h3>
+                            <p>Manage your plan and unlock features</p>
+                        </div>
+                        <button className="settings-btn" onClick={() => navigate('/subscription')}>Upgrade</button>
                     </div>
 
                     <div className="settings-item">

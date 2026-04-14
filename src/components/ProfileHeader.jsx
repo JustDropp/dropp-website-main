@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
     User, MessageCircle, MoreHorizontal, MapPin,
     Link as LinkIcon, ArrowLeft, Share2, Ban, Flag,
-    Settings, BarChart3,
+    Settings, BarChart3, Eye, Heart, Crown,
 } from 'lucide-react';
 import FollowListModal from './FollowListModal';
 import '../styles/Profile.css';
@@ -218,6 +218,23 @@ const ProfileHeader = ({
                             </a>
                         )}
                     </div>
+
+                    {isOwnProfile && (
+                        <div className="profile-quick-actions">
+                            <Link to="/profile-views" className="profile-quick-action-btn">
+                                <Eye size={18} strokeWidth={2} />
+                                <span>Views</span>
+                            </Link>
+                            <Link to="/liked-products" className="profile-quick-action-btn">
+                                <Heart size={18} strokeWidth={2} />
+                                <span>Liked</span>
+                            </Link>
+                            <Link to="/subscription" className="profile-quick-action-btn profile-quick-action-btn--accent">
+                                <Crown size={18} strokeWidth={2} />
+                                <span>Plans</span>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
 

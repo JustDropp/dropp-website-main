@@ -31,6 +31,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyEmailToken from './pages/VerifyEmailToken';
 import Analytics from './pages/Analytics';
+import ProfileViews from './pages/ProfileViews';
+import LikedProducts from './pages/LikedProducts';
+import Subscription from './pages/Subscription';
 import Help from './pages/Help';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -118,6 +121,21 @@ const AnimatedRoutes = () => {
         <Route path="/analytics" element={
           <ProtectedRoute>
             <Analytics />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile-views" element={
+          <ProtectedRoute>
+            <ProfileViews />
+          </ProtectedRoute>
+        } />
+        <Route path="/liked-products" element={
+          <ProtectedRoute>
+            <LikedProducts />
+          </ProtectedRoute>
+        } />
+        <Route path="/subscription" element={
+          <ProtectedRoute>
+            <Subscription />
           </ProtectedRoute>
         } />
 
