@@ -101,6 +101,19 @@ export const AuthProvider = ({ children }) => {
     };
 
     /**
+     * Update user data in state and localStorage
+     * @param {Object} userData 
+     */
+    const updateUser = (userData) => {
+        setUser(userData);
+        // If we also store user data in localStorage, update it there too
+        const storedUser = localStorage.getItem('dropp_user_data');
+        if (storedUser) {
+            localStorage.setItem('dropp_user_data', JSON.stringify(userData));
+        }
+    };
+
+    /**
      * Clear error
      */
     const clearError = () => {
@@ -117,6 +130,7 @@ export const AuthProvider = ({ children }) => {
         signup,
         logout,
         clearError,
+        updateUser,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

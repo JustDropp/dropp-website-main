@@ -21,6 +21,8 @@ export class UserProfile {
         this.following = data.following;
         this.profileImageUrl = data.profileImageUrl;
         this.role = data.role;
+        this.plan = data.plan || 'free';
+        this.features = data.features || {};
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
         this.usernameLastUpdated = data.usernameLastUpdated;

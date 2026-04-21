@@ -20,6 +20,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import CreateCollectionModal from './CreateCollectionModal';
+import ProfileBadge from './ProfileBadge';
 import '../styles/Sidebar.css';
 
 const Sidebar = () => {
@@ -27,7 +28,7 @@ const Sidebar = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, logout, user } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const { unreadCount } = useNotifications();
 
@@ -38,7 +39,7 @@ const Sidebar = () => {
     ];
 
     const userNavItems = isAuthenticated ? [
-        { path: '/profile/me', label: 'Profile', icon: User },
+        { path: '/profile/me', label: 'Profile', icon: User, badge: true },
         { path: '/notifications', label: 'Notifications', icon: Bell },
         { path: '/analytics', label: 'Analytics', icon: BarChart3 },
         { path: '/profile-views', label: 'Profile Views', icon: Eye },
@@ -111,7 +112,7 @@ const Sidebar = () => {
                         <>
                             <div className="sidebar-divider" />
                             <div className="sidebar-section">
-                                {userNavItems.map(({ path, label, icon: Icon }) => (
+                                {userNavItems.map(({ path, label, icon: Icon, badge }) => (
                                     <Link
                                         key={path}
                                         to={path}
@@ -124,7 +125,14 @@ const Sidebar = () => {
                                                 <div className="sidebar-badge">{unreadCount}</div>
                                             )}
                                         </div>
-                                        {isExpanded && <span className="sidebar-item-label">{label}</span>}
+                                        {isExpanded && (
+                                            <div className="sidebar-item-label-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                                <span className="sidebar-item-label">{label}</span>
+                                                {badge && user?.plan && user.plan !== 'free' && (
+                                                    <ProfileBadge plan={user.plan} size={14} />
+                                                )}
+                                            </div>
+                                        )}
                                         {isActive(path) && <div className="sidebar-item-indicator" />}
                                     </Link>
                                 ))}
@@ -212,8 +220,13 @@ const Sidebar = () => {
                     to="/profile/me"
                     className={`bottom-nav-item ${location.pathname.startsWith('/profile') ? 'active' : ''}`}
                 >
-                    <div className="bottom-nav-icon-wrapper">
+                    <div className="bottom-nav-icon-wrapper" style={{ position: 'relative' }}>
                         <User size={22} />
+                        {user?.plan && user.plan !== 'free' && (
+                            <div style={{ position: 'absolute', top: -4, right: -4 }}>
+                                <ProfileBadge plan={user.plan} size={10} />
+                            </div>
+                        )}
                     </div>
                     <span className="bottom-nav-label">Profile</span>
                 </Link>

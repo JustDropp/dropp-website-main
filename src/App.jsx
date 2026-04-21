@@ -34,6 +34,7 @@ import Analytics from './pages/Analytics';
 import ProfileViews from './pages/ProfileViews';
 import LikedProducts from './pages/LikedProducts';
 import Subscription from './pages/Subscription';
+import PlanDetails from './pages/PlanDetails';
 import Help from './pages/Help';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -136,6 +137,11 @@ const AnimatedRoutes = () => {
         <Route path="/subscription" element={
           <ProtectedRoute>
             <Subscription />
+          </ProtectedRoute>
+        } />
+        <Route path="/plan-details" element={
+          <ProtectedRoute>
+            <PlanDetails />
           </ProtectedRoute>
         } />
 

@@ -7,6 +7,7 @@ import {
     Settings, BarChart3, Eye, Heart, Crown,
 } from 'lucide-react';
 import FollowListModal from './FollowListModal';
+import ProfileBadge from './ProfileBadge';
 import '../styles/Profile.css';
 
 const ProfileHeader = ({
@@ -23,7 +24,7 @@ const ProfileHeader = ({
     const [showOptions, setShowOptions] = useState(false);
     const [followModal, setFollowModal] = useState({ isOpen: false, type: 'followers' });
     const navigate = useNavigate();
-    const { avatar, fullName, username, bio, location, link, pronoun, stats, isFollowing, followsMe } = user;
+    const { avatar, fullName, username, bio, location, link, pronoun, stats, isFollowing, followsMe, plan } = user;
     const userId = user._id || user.id;
 
     // Close menu on outside click
@@ -64,7 +65,10 @@ const ProfileHeader = ({
                     <div
                         className="profile-avatar"
                         onClick={onAvatarClick}
-                        style={onAvatarClick ? { cursor: 'pointer' } : {}}
+                        style={{
+                            ...(onAvatarClick ? { cursor: 'pointer' } : {}),
+                            position: 'relative'
+                        }}
                     >
                         {avatar ? (
                             <img
@@ -90,12 +94,28 @@ const ProfileHeader = ({
                         >
                             <User size={48} />
                         </div>
+
+                        {/* Plan Badge */}
+                        {plan && plan !== 'free' && (
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '5%',
+                                right: '5%',
+                                zIndex: 2,
+                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                            }}>
+                                <ProfileBadge plan={plan} size={18} />
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <div className="profile-info-section">
                     <div className="profile-username-row">
-                        <h1 className="profile-username">{username}</h1>
+                        <h1 className="profile-username" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {username}
+                            {plan && plan !== 'free' && <ProfileBadge plan={plan} size={16} />}
+                        </h1>
 
                         <div className="profile-actions">
                             {!isOwnProfile && (

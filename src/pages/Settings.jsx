@@ -293,9 +293,20 @@ const Settings = () => {
                     <div className="settings-item">
                         <div className="settings-item-content">
                             <h3>Subscription & Plans</h3>
-                            <p>Manage your plan and unlock features</p>
+                            <p>
+                                {userProfile?.plan && userProfile.plan !== 'free' 
+                                    ? `You are currently on the ${userProfile.plan.toUpperCase()} plan` 
+                                    : 'Manage your plan and unlock features'}
+                            </p>
                         </div>
-                        <button className="settings-btn" onClick={() => navigate('/subscription')}>Upgrade</button>
+                        <div className="settings-actions" style={{ display: 'flex', gap: '8px' }}>
+                            {userProfile?.plan && userProfile.plan !== 'free' && (
+                                <button className="settings-btn" onClick={() => navigate('/plan-details')}>Details</button>
+                            )}
+                            <button className="settings-btn" onClick={() => navigate('/subscription')}>
+                                {userProfile?.plan && userProfile.plan !== 'free' ? 'Change' : 'Upgrade'}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="settings-item">

@@ -105,6 +105,10 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
+.sub-plan-card--current {
+    border: 2px solid var(--color-accent);
+}
+
 /* ─── Popular / LITE Card (Dark bg) ─── */
 
 .sub-plan-card--popular {
@@ -119,6 +123,10 @@
 .sub-plan-card--popular:hover {
     transform: scale(1.04) translateY(-3px);
     box-shadow: 0 20px 56px rgba(30, 10, 60, 0.4);
+}
+
+.sub-plan-card--popular.sub-plan-card--current {
+    border: 2px solid #fff;
 }
 
 .sub-plan-card--popular .sub-plan-label,
@@ -162,6 +170,20 @@
     color: #fff;
     background: #111;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sub-plan-current-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--color-accent);
 }
 
 /* Plan Header */
@@ -328,6 +350,9 @@
     transition: opacity var(--transition-fast), transform var(--transition-fast);
     border: none;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sub-plan-btn:hover {
@@ -361,6 +386,12 @@
     background: var(--deep-gradient);
     color: #fff;
     box-shadow: 0 4px 16px rgba(30, 10, 60, 0.3);
+}
+
+.sub-plan-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
 }
 
 /* ─── Feature Comparison ─── */
@@ -433,6 +464,127 @@
     font-weight: 700;
     color: var(--text-primary);
     font-size: 0.875rem;
+}
+
+/* ─── Success Modal ─── */
+
+.sub-success-modal {
+    background: var(--bg-primary);
+    padding: 2.5rem;
+    border-radius: 32px;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+}
+
+.sub-success-icon-wrap {
+    width: 80px;
+    height: 80px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.sub-success-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.sub-success-msg {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.sub-success-card {
+    background: var(--bg-secondary);
+    padding: 1.25rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.sub-success-badge-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.sub-success-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.sub-upsell-box {
+    background: linear-gradient(135deg, #1e0a3c 0%, #31115e 100%);
+    padding: 1.5rem;
+    border-radius: 20px;
+    color: #fff;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.sub-upsell-box h3 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+}
+
+.sub-upsell-box p {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+}
+
+.sub-upsell-btn {
+    background: #fff;
+    color: #1e0a3c;
+    border: none;
+    padding: 0.65rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.sub-upsell-btn:hover {
+    transform: translateX(4px);
+}
+
+.sub-success-close-btn {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.sub-success-close-btn:hover {
+    opacity: 0.9;
 }
 
 /* ─── FAQ ─── */
@@ -517,6 +669,10 @@
     .sub-compare-table td {
         padding: 0.6rem 0.65rem;
         font-size: 0.8125rem;
+    }
+    
+    .sub-success-modal {
+        padding: 1.5rem;
     }
 }
 

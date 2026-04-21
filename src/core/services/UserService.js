@@ -209,7 +209,37 @@ class UserService {
     }
 
     async getLikedProducts() {
-        return UserRepository.getLikedProducts();
+        try {
+            return await UserRepository.getLikedProducts();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Create a subscription order
+     * @param {string} planId - The ID of the plan (lite/pro)
+     * @returns {Promise<Object>} - Razorpay order details
+     */
+    async createSubscription(planId) {
+        try {
+            return await UserRepository.createSubscription(planId);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Verify subscription payment
+     * @param {Object} paymentData - Razorpay payment response data
+     * @returns {Promise<Object>} - Verification result
+     */
+    async verifySubscription(paymentData) {
+        try {
+            return await UserRepository.verifySubscription(paymentData);
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

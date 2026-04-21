@@ -261,6 +261,38 @@ class UserRepository {
             throw error;
         }
     }
+
+    /**
+     * Create a subscription order
+     * @param {string} planId - The ID of the plan (lite/pro)
+     * @returns {Promise<Object>} - Razorpay subscription details { subscriptionId, key }
+     */
+    async createSubscription(planId) {
+        try {
+            const response = await apiClient.post(API_CONFIG.ENDPOINTS.SUBSCRIPTION_CREATE, { plan: planId });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Verify subscription payment
+     * @param {Object} paymentData - Razorpay response data
+     * @returns {Promise<Object>} - Verification result
+     */
+    async verifySubscription(paymentData) {
+        try {
+            const response = await apiClient.post(API_CONFIG.ENDPOINTS.SUBSCRIPTION_VERIFY, {
+                razorpay_payment_id: paymentData.razorpay_payment_id,
+                razorpay_subscription_id: paymentData.razorpay_subscription_id,
+                razorpay_signature: paymentData.razorpay_signature,
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default new UserRepository();
