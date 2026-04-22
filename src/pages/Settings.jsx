@@ -300,11 +300,10 @@ const Settings = () => {
                             </p>
                         </div>
                         <div className="settings-actions" style={{ display: 'flex', gap: '8px' }}>
-                            {userProfile?.plan && userProfile.plan !== 'free' && (
-                                <button className="settings-btn" onClick={() => navigate('/plan-details')}>Details</button>
-                            )}
+                            <button className="settings-btn" onClick={() => navigate('/transactions')}>Transactions</button>
+                            <button className="settings-btn" onClick={() => navigate('/plan-details')}>Details</button>
                             <button className="settings-btn" onClick={() => navigate('/subscription')}>
-                                {userProfile?.plan && userProfile.plan !== 'free' ? 'Change' : 'Upgrade'}
+                                {userProfile?.plan === 'lite' ? 'Upgrade' : 'View Plans'}
                             </button>
                         </div>
                     </div>

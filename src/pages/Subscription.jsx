@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Check, X, Sparkles, Zap, ChevronDown, Loader2, PartyPopper, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Crown, Check, X, Sparkles, Zap, ChevronDown, Loader2, PartyPopper, ArrowRight, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from '../components/Snackbar';
 import { useAuth } from '../contexts/AuthContext';
@@ -146,6 +146,66 @@ const FaqItem = ({ faq, isOpen, onToggle }) => (
     </div>
 );
 
+const CancelModal = ({ onConfirm, onClose, loading }) => (
+    <div className="modal-overlay" style={{ zIndex: 1000 }}>
+        <motion.div
+            className="sub-success-modal"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            style={{ maxWidth: '420px' }}
+        >
+            <div className="sub-success-icon-wrap" style={{ background: 'rgba(220,38,38,0.08)' }}>
+                <AlertTriangle size={40} style={{ color: '#dc2626' }} />
+            </div>
+            <h2 className="sub-success-title" style={{ fontSize: '1.4rem' }}>Cancel Subscription?</h2>
+            <p className="sub-success-msg">
+                Your plan will remain active until the end of the current billing period. After that, your account will revert to the <strong>Free</strong> plan.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+                <button
+                    onClick={onClose}
+                    disabled={loading}
+                    style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        borderRadius: '10px',
+                        border: '1px solid var(--border-color)',
+                        background: 'var(--bg-secondary)',
+                        color: 'var(--text-primary)',
+                        fontWeight: 600,
+                        cursor: loading ? 'not-allowed' : 'pointer',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    Keep Plan
+                </button>
+                <button
+                    onClick={onConfirm}
+                    disabled={loading}
+                    style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: '#dc2626',
+                        color: '#fff',
+                        fontWeight: 600,
+                        cursor: loading ? 'not-allowed' : 'pointer',
+                        fontSize: '0.9rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem'
+                    }}
+                >
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Yes, Cancel'}
+                </button>
+            </div>
+        </motion.div>
+    </div>
+);
+
 const SuccessModal = ({ plan, onClose, onUpgradeToPro }) => (
     <div className="modal-overlay" style={{ zIndex: 1000 }}>
         <motion.div 
@@ -196,6 +256,10 @@ const Subscription = () => {
     const [loadingPlan, setLoadingPlan] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [justSubscribedPlan, setJustSubscribedPlan] = useState('');
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelLoading, setCancelLoading] = useState(false);
+    const [currentPlan, setCurrentPlan] = useState(user?.plan || null);
+    const [planLoading, setPlanLoading] = useState(!user?.plan);
 
     useEffect(() => {
         // Load Razorpay script
@@ -209,13 +273,23 @@ const Subscription = () => {
         };
     }, []);
 
+    // Sync currentPlan whenever auth context user updates (e.g. after AuthContext fetches fresh profile)
+    useEffect(() => {
+        if (user?.plan) {
+            setCurrentPlan(user.plan);
+            setPlanLoading(false);
+        } else if (!isAuthenticated) {
+            setPlanLoading(false);
+        }
+    }, [user?.plan, isAuthenticated]);
+
     const handleUpgrade = async (planId) => {
         if (!isAuthenticated) {
             navigate('/login', { state: { from: '/subscription' } });
             return;
         }
 
-        if (planId === 'free' || user?.plan === planId) {
+        if (planId === 'free' || currentPlan === planId) {
             setSnackbar({
                 visible: true,
                 message: planId === 'free' ? "You are already on the Free plan." : `You are already on the ${planId} plan.`,
@@ -253,8 +327,15 @@ const Subscription = () => {
                         });
 
                         if (verificationResult.success) {
-                            // 4. Update user context
-                            updateUser(verificationResult.user);
+                            // 4. Re-fetch fresh profile so plan is definitely up to date
+                            try {
+                                const freshProfile = await UserService.getUserProfile();
+                                updateUser(freshProfile);
+                                setCurrentPlan(freshProfile.plan);
+                            } catch {
+                                updateUser(verificationResult.user);
+                                setCurrentPlan(planId);
+                            }
                             setJustSubscribedPlan(planId);
                             setShowSuccess(true);
                         } else {
@@ -297,6 +378,34 @@ const Subscription = () => {
         }
     };
 
+    const handleCancelSubscription = async () => {
+        setCancelLoading(true);
+        try {
+            await UserService.cancelSubscription();
+            const freshProfile = await UserService.getUserProfile().catch(() => null);
+            updateUser(freshProfile || { ...user, plan: 'free' });
+            setCurrentPlan(freshProfile?.plan || 'free');
+            setShowCancelModal(false);
+            setSnackbar({ visible: true, message: 'Subscription cancelled. Your plan will remain active until the billing period ends.', type: 'info' });
+        } catch (err) {
+            setSnackbar({ visible: true, message: err.message || 'Failed to cancel subscription. Please try again.', type: 'error' });
+        } finally {
+            setCancelLoading(false);
+        }
+    };
+
+    const isLiteUser = currentPlan === 'lite';
+    const isPaidUser = currentPlan && currentPlan !== 'free';
+    const proPlan = plans.find(p => p.id === 'pro');
+
+    if (planLoading) {
+        return (
+            <div className="subscription-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+                <Loader2 className="animate-spin" size={32} style={{ color: 'var(--text-secondary)' }} />
+            </div>
+        );
+    }
+
     return (
         <motion.div
             className="subscription-page"
@@ -306,13 +415,20 @@ const Subscription = () => {
         >
             <AnimatePresence>
                 {showSuccess && (
-                    <SuccessModal 
-                        plan={justSubscribedPlan} 
-                        onClose={() => setShowSuccess(false)}
+                    <SuccessModal
+                        plan={justSubscribedPlan}
+                        onClose={() => { setShowSuccess(false); navigate('/plan-details'); }}
                         onUpgradeToPro={() => {
                             setShowSuccess(false);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
+                    />
+                )}
+                {showCancelModal && (
+                    <CancelModal
+                        onConfirm={handleCancelSubscription}
+                        onClose={() => setShowCancelModal(false)}
+                        loading={cancelLoading}
                     />
                 )}
             </AnimatePresence>
@@ -329,70 +445,177 @@ const Subscription = () => {
                 >
                     <span className="sub-hero-pill">
                         <Crown size={14} strokeWidth={2.2} />
-                        Plans & Pricing
+                        {isLiteUser ? 'Upgrade to Pro' : 'Plans & Pricing'}
                     </span>
-                    <h1 className="sub-hero-title">Unlock Your Full Potential</h1>
+                    <h1 className="sub-hero-title">
+                        {isLiteUser ? 'Go Further with PRO' : 'Unlock Your Full Potential'}
+                    </h1>
                     <p className="sub-hero-sub">
-                        Choose a plan that fits your creative journey
+                        {isLiteUser
+                            ? 'Unlimited products, advanced analytics, and priority brand deals — all in one plan.'
+                            : 'Choose a plan that fits your creative journey'}
                     </p>
                 </motion.div>
             </div>
 
-            {/* Pricing Cards */}
-            <section className="sub-plans">
-                {plans.map((plan, i) => (
+            {/* Lite user: PRO-only upgrade view */}
+            {isLiteUser ? (
+                <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginBottom: 'var(--spacing-lg)' }}>
                     <motion.div
-                        key={plan.id}
-                        className={`sub-plan-card ${plan.popular ? 'sub-plan-card--popular' : ''} ${user?.plan === plan.id ? 'sub-plan-card--current' : ''}`}
+                        className="sub-plan-card"
+                        style={{ maxWidth: 480, width: '100%', background: 'var(--color-deep, #1E0A3C)', color: '#fff', border: 'none', boxShadow: '0 16px 48px rgba(30,10,60,0.35)' }}
                         initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        {plan.popular && <span className="sub-plan-badge">Best choice</span>}
-                        {user?.plan === plan.id && <span className="sub-plan-current-badge">Current Plan</span>}
+                        <span className="sub-plan-badge">Recommended</span>
 
                         <div className="sub-plan-header">
-                            <div className={`sub-plan-icon ${plan.popular ? 'sub-plan-icon--popular' : ''}`}>
-                                {React.createElement(plan.icon, { size: 20, strokeWidth: 2 })}
+                            <div className="sub-plan-icon sub-plan-icon--popular">
+                                {React.createElement(proPlan.icon, { size: 20, strokeWidth: 2 })}
                             </div>
-                            <h2 className="sub-plan-label">{plan.label}</h2>
+                            <h2 className="sub-plan-label" style={{ color: '#fff' }}>{proPlan.label}</h2>
                         </div>
 
                         <div className="sub-plan-pricing">
-                            <span className="sub-plan-currency">₹</span>
-                            <span className="sub-plan-price">{plan.price.replace('₹', '')}</span>
-                            <span className="sub-plan-period">{plan.period}</span>
+                            <span className="sub-plan-currency" style={{ color: '#fff' }}>₹</span>
+                            <span className="sub-plan-price" style={{ color: '#fff' }}>{proPlan.price.replace('₹', '')}</span>
+                            <span className="sub-plan-period" style={{ color: 'rgba(255,255,255,0.6)' }}>{proPlan.period}</span>
                         </div>
 
-                        <p className="sub-plan-description">{plan.description}</p>
+                        <p className="sub-plan-description" style={{ color: 'rgba(255,255,255,0.72)' }}>{proPlan.description}</p>
 
-                        <div className="sub-plan-divider" />
+                        <div className="sub-plan-divider" style={{ background: 'rgba(255,255,255,0.15)' }} />
 
                         <ul className="sub-plan-features">
-                            {plan.features.map((feat) => (
-                                <FeatureItem
-                                    key={feat.text}
-                                    text={feat.text}
-                                    included={feat.included}
-                                    isPopular={plan.popular}
-                                />
+                            {proPlan.features.map((feat) => (
+                                <FeatureItem key={feat.text} text={feat.text} included={feat.included} isPopular={true} />
                             ))}
                         </ul>
 
                         <button
-                            className={`sub-plan-btn sub-plan-btn--${plan.btnVariant}`}
-                            onClick={() => handleUpgrade(plan.id)}
-                            disabled={loadingPlan === plan.id || user?.plan === plan.id}
+                            className="sub-plan-btn sub-plan-btn--deep"
+                            onClick={() => handleUpgrade('pro')}
+                            disabled={loadingPlan === 'pro'}
                         >
-                            {loadingPlan === plan.id ? (
-                                <Loader2 className="animate-spin" size={20} />
-                            ) : (
-                                user?.plan === plan.id ? 'Current Plan' : plan.btnLabel
-                            )}
+                            {loadingPlan === 'pro' ? <Loader2 className="animate-spin" size={20} /> : 'Upgrade to Pro'}
                         </button>
                     </motion.div>
-                ))}
-            </section>
+
+                    {/* Actions for lite users */}
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => navigate('/transactions')}
+                            style={{
+                                background: 'none',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
+                                padding: '0.6rem 1.5rem',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.875rem',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            View Transactions
+                        </button>
+                        <button
+                            onClick={() => setShowCancelModal(true)}
+                            style={{
+                                background: 'none',
+                                border: '1px solid #dc2626',
+                                color: '#dc2626',
+                                padding: '0.6rem 1.5rem',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                                fontSize: '0.875rem',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Cancel Subscription
+                        </button>
+                    </div>
+                </section>
+            ) : (
+                <>
+                    {/* All-plans grid */}
+                    <section className="sub-plans">
+                        {plans.map((plan, i) => (
+                            <motion.div
+                                key={plan.id}
+                                className={`sub-plan-card ${plan.popular ? 'sub-plan-card--popular' : ''} ${currentPlan === plan.id ? 'sub-plan-card--current' : ''}`}
+                                initial={{ opacity: 0, y: 24 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.1 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                            >
+                                {plan.popular && <span className="sub-plan-badge">Best choice</span>}
+                                {currentPlan === plan.id && <span className="sub-plan-current-badge">Current Plan</span>}
+
+                                <div className="sub-plan-header">
+                                    <div className={`sub-plan-icon ${plan.popular ? 'sub-plan-icon--popular' : ''}`}>
+                                        {React.createElement(plan.icon, { size: 20, strokeWidth: 2 })}
+                                    </div>
+                                    <h2 className="sub-plan-label">{plan.label}</h2>
+                                </div>
+
+                                <div className="sub-plan-pricing">
+                                    <span className="sub-plan-currency">₹</span>
+                                    <span className="sub-plan-price">{plan.price.replace('₹', '')}</span>
+                                    <span className="sub-plan-period">{plan.period}</span>
+                                </div>
+
+                                <p className="sub-plan-description">{plan.description}</p>
+
+                                <div className="sub-plan-divider" />
+
+                                <ul className="sub-plan-features">
+                                    {plan.features.map((feat) => (
+                                        <FeatureItem
+                                            key={feat.text}
+                                            text={feat.text}
+                                            included={feat.included}
+                                            isPopular={plan.popular}
+                                        />
+                                    ))}
+                                </ul>
+
+                                <button
+                                    className={`sub-plan-btn sub-plan-btn--${plan.btnVariant}`}
+                                    onClick={() => handleUpgrade(plan.id)}
+                                    disabled={loadingPlan === plan.id || currentPlan === plan.id}
+                                >
+                                    {loadingPlan === plan.id ? (
+                                        <Loader2 className="animate-spin" size={20} />
+                                    ) : (
+                                        currentPlan === plan.id ? 'Current Plan' : plan.btnLabel
+                                    )}
+                                </button>
+                            </motion.div>
+                        ))}
+                    </section>
+
+                    {/* Cancel subscription (pro users) */}
+                    {isPaidUser && (
+                        <div style={{ textAlign: 'center', marginTop: '0.5rem', marginBottom: '2rem' }}>
+                            <button
+                                onClick={() => setShowCancelModal(true)}
+                                style={{
+                                    background: 'none',
+                                    border: '1px solid #dc2626',
+                                    color: '#dc2626',
+                                    padding: '0.6rem 1.5rem',
+                                    borderRadius: '8px',
+                                    fontWeight: 600,
+                                    fontSize: '0.875rem',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Cancel Subscription
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
 
             {/* Feature Comparison Table */}
             <section className="sub-compare">

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService from '../core/services/AuthService';
+import UserService from '../core/services/UserService';
 
 const AuthContext = createContext();
 
@@ -18,17 +19,24 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Initialize auth state from localStorage
+    // Initialize auth state from localStorage, then hydrate with fresh profile from API
     useEffect(() => {
-        const initAuth = () => {
+        const initAuth = async () => {
             try {
                 const storedToken = AuthService.getToken();
                 if (storedToken) {
-                    const userData = AuthService.getUserFromToken();
-                    if (userData) {
+                    const tokenData = AuthService.getUserFromToken();
+                    if (tokenData) {
                         setToken(storedToken);
-                        setUser(userData);
                         setIsAuthenticated(true);
+                        // Fetch fresh profile so plan/features are always up to date
+                        try {
+                            const freshProfile = await UserService.getUserProfile();
+                            setUser(freshProfile);
+                        } catch {
+                            // Fall back to token data if API call fails
+                            setUser(tokenData);
+                        }
                     }
                 }
             } catch (err) {
@@ -53,11 +61,17 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const response = await AuthService.login(identifier, password);
-            const userData = AuthService.getUserFromToken();
 
             setToken(response.token);
-            setUser(userData);
             setIsAuthenticated(true);
+
+            // Fetch fresh profile so plan/features are correct from the start
+            try {
+                const freshProfile = await UserService.getUserProfile();
+                setUser(freshProfile);
+            } catch {
+                setUser(AuthService.getUserFromToken());
+            }
 
             return { success: true, data: response };
         } catch (err) {

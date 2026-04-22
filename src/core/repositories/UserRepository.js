@@ -277,6 +277,32 @@ class UserRepository {
     }
 
     /**
+     * Get subscription transaction history
+     * @returns {Promise<Array>} - List of transactions
+     */
+    async getSubscriptionTransactions() {
+        try {
+            const response = await apiClient.get(API_CONFIG.ENDPOINTS.SUBSCRIPTION_TRANSACTIONS);
+            return response.data?.transactions || [];
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Cancel active subscription
+     * @returns {Promise<Object>}
+     */
+    async cancelSubscription() {
+        try {
+            const response = await apiClient.post(API_CONFIG.ENDPOINTS.SUBSCRIPTION_CANCEL);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Verify subscription payment
      * @param {Object} paymentData - Razorpay response data
      * @returns {Promise<Object>} - Verification result

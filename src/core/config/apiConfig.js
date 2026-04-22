@@ -44,6 +44,8 @@ export const API_CONFIG = {
         LIKED_PRODUCTS: '/user/liked/products',
         SUBSCRIPTION_CREATE: '/subscription/create',
         SUBSCRIPTION_VERIFY: '/subscription/verify',
+        SUBSCRIPTION_TRANSACTIONS: '/subscription/transactions',
+        SUBSCRIPTION_CANCEL: '/subscription/cancel',
         BRAND_SIGNUP: '/brand/signup',
         BRAND_LOGIN: '/brand/login',
         BRAND_PROFILE: '/brand',

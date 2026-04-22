@@ -230,6 +230,30 @@ class UserService {
     }
 
     /**
+     * Cancel active subscription
+     * @returns {Promise<Object>}
+     */
+    async cancelSubscription() {
+        try {
+            return await UserRepository.cancelSubscription();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Get subscription transaction history
+     * @returns {Promise<Array>} - List of transactions
+     */
+    async getSubscriptionTransactions() {
+        try {
+            return await UserRepository.getSubscriptionTransactions();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Verify subscription payment
      * @param {Object} paymentData - Razorpay payment response data
      * @returns {Promise<Object>} - Verification result
